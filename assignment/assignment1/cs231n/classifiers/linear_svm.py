@@ -25,44 +25,33 @@ def svm_loss_naive(W, X, y, reg):
   num_classes = W.shape[1]
   num_train = X.shape[0]
   loss = 0.0
-  dW = np.zeros_like(W)
   for i in range(num_train):    
     scores = X[i].dot(W)
-    
     dscores = np.zeros_like(scores)
-    dscores[y[i]] = 1
-    dscores2 = np.zeros_like(scores)
-    
     correct_class_score = scores[y[i]]
-    dcorrect_class_score = -1
     
     for j in range(num_classes):
       if j == y[i]:
-        dscore_j = 0
-        dscores2[j] = 0
         continue
       margin = scores[j] - correct_class_score + 1 # note delta = 1
-      dmargin = 1
-      dscore_j = 1
-      dscores2[j] = 1
+
       dWi = X[i]
       if margin > 0:
         loss += margin
-        
-      dmargin_scores = dscores * dcorrect_class_score
-      dmargin_scores2 = dscores2 * dscore_j
-      dmargin_scores += dmargin_scores2
-      dmargin_Wi = dmargin_scores * dWi[:,None]
-    dW += dmargin_Wi
+        dscores[j] = 1
+        dscores[y[i]] -= 1
+    dWi = X[i][:,None].dot(dscores[None,:])
+    dW += dWi
 
   # Right now the loss is a sum over all training examples, but we want it
   # to be an average instead so we divide by num_train.
   loss /= num_train
-  dW /= dW
+  #print(dW)
+  dW /= num_train
 
   # Add regularization to the loss.
   loss += reg * np.sum(W * W)
-  dW += 2*W
+  dW += reg * 2*W
 
   #############################################################################
   # TODO:                                                                     #
@@ -72,7 +61,6 @@ def svm_loss_naive(W, X, y, reg):
   # loss is being computed. As a result you may need to modify some of the    #
   # code above to compute the gradient.                                       #
   #############################################################################
-
 
   return loss, dW
 
@@ -110,5 +98,45 @@ def svm_loss_vectorized(W, X, y, reg):
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
+
+  return loss, dW
+
+
+def svm_loss_pytorch(W, X, y, reg):
+  """
+  Structured SVM loss function, pytorch implementation.
+
+  Inputs and outputs are the same as svm_loss_naive.
+  """
+  import torch
+  
+  W = torch.from_numpy(W)
+  W.requires_grad = True
+  X = torch.from_numpy(X)
+  y = torch.from_numpy(y).long()
+  
+  
+
+  # compute the loss and the gradient
+  num_classes = W.shape[1]
+  num_train = X.shape[0]
+  loss = torch.tensor(0.0, dtype=torch.float64)
+  for i in range(num_train):    
+    scores = X[i][None,:].mm(W)
+    correct_class_score = scores[0,y[i]]
+    for j in range(num_classes):
+      if j == y[i]:
+        continue
+      margin = scores[0,j] - correct_class_score + 1 # note delta = 1
+      if margin > 0:
+        loss += margin
+  
+  loss /= num_train   
+  loss.backward()
+  loss = loss.detach().numpy()
+  
+  dW = W.grad.detach().numpy()
+  dW += reg * 2*(W.detach().numpy())
+
 
   return loss, dW
