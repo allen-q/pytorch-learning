@@ -79,7 +79,12 @@ def svm_loss_vectorized(W, X, y, reg):
   # Implement a vectorized version of the structured SVM loss, storing the    #
   # result in loss.                                                           #
   #############################################################################
-  pass
+  scores = np.dot(X,W)
+  margin = (scores-(scores[np.arange(len(scores)), y][:,None]))+1
+  margin = np.clip(margin, 0, margin.max())
+  margin = margin.sum(1)-1
+  loss = margin.mean()
+  loss += reg * np.sum(W * W)
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -98,5 +103,46 @@ def svm_loss_vectorized(W, X, y, reg):
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
+
+  return loss, dW
+
+
+def svm_loss_pytorch(W, X, y, reg):
+  """
+  Structured SVM loss function, pytorch implementation.
+
+  Inputs and outputs are the same as svm_loss_naive.
+  """
+  import torch
+  
+  W = torch.from_numpy(W)
+  W.requires_grad = True
+  X = torch.from_numpy(X)
+  y = torch.from_numpy(y).long()
+  
+  
+
+  # compute the loss and the gradient
+  num_classes = W.shape[1]
+  num_train = X.shape[0]
+  loss = torch.tensor(0.0, dtype=torch.float64)
+  for i in range(num_train):    
+    scores = X[i][None,:].mm(W)
+    correct_class_score = scores[0,y[i]]
+    for j in range(num_classes):
+      if j == y[i].item():
+        continue
+      margin = scores[0,j] - correct_class_score + 1 # note delta = 1
+      if margin > 0:
+        loss += margin
+  
+  loss /= num_train   
+  loss += reg * torch.sum(W**2)
+  loss.backward()
+  loss = loss.detach().numpy()
+  
+  dW = W.grad.detach().numpy()
+  #dW += reg * 2*(W.detach().numpy())
+
 
   return loss, dW

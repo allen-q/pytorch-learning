@@ -79,7 +79,12 @@ def svm_loss_vectorized(W, X, y, reg):
   # Implement a vectorized version of the structured SVM loss, storing the    #
   # result in loss.                                                           #
   #############################################################################
-  pass
+  scores = np.dot(X,W)
+  margin = (scores-(scores[np.arange(len(scores)), y][:,None]))+1
+  margin_clip = np.clip(margin, 0, margin.max())
+  margin_sum = margin_clip.sum(1)-1
+  loss = margin_sum.mean()
+  loss += reg * np.sum(W * W)
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -94,7 +99,27 @@ def svm_loss_vectorized(W, X, y, reg):
   # to reuse some of the intermediate values that you used to compute the     #
   # loss.                                                                     #
   #############################################################################
-  pass
+  dloss = 1
+
+  dmargin_sum = 1/len(margin_sum)
+
+  dmargin_clip = np.ones_like(margin_clip)
+
+  dmargin = np.where(margin>0, 1, 0)
+
+  dscores = np.ones_like(scores)
+
+  dW_local = X
+
+  dloss_margin_clip = dmargin_sum * dmargin_clip
+
+  dloss_margin = dloss_margin_clip * dmargin
+
+  dloss_scores = dloss_margin * dscores
+
+  dW = np.dot(X.T, dloss_scores)
+  #dW /= W.shape[0]
+  dW += reg * 2 * W
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -125,18 +150,19 @@ def svm_loss_pytorch(W, X, y, reg):
     scores = X[i][None,:].mm(W)
     correct_class_score = scores[0,y[i]]
     for j in range(num_classes):
-      if j == y[i]:
+      if j == y[i].item():
         continue
       margin = scores[0,j] - correct_class_score + 1 # note delta = 1
       if margin > 0:
         loss += margin
   
   loss /= num_train   
+  loss += reg * torch.sum(W**2)
   loss.backward()
   loss = loss.detach().numpy()
   
   dW = W.grad.detach().numpy()
-  dW += reg * 2*(W.detach().numpy())
+  #dW += reg * 2*(W.detach().numpy())
 
 
   return loss, dW
