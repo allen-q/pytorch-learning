@@ -100,23 +100,14 @@ def svm_loss_vectorized(W, X, y, reg):
   # loss.                                                                     #
   #############################################################################
   dloss = 1
-
   dmargin_sum = 1/len(margin_sum)
-
   dmargin_clip = np.ones_like(margin_clip)
-
   dmargin = np.where(margin>0, 1, 0)
-
   dscores = np.ones_like(scores)
-
   dW_local = X
-
   dloss_margin_clip = dmargin_sum * dmargin_clip
-
   dloss_margin = dloss_margin_clip * dmargin
-
   dloss_scores = dloss_margin * dscores
-
   dW = np.dot(X.T, dloss_scores)
   #dW /= W.shape[0]
   dW += reg * 2 * W
