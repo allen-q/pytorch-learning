@@ -75,10 +75,7 @@ class TwoLayerNet(object):
     # Store the result in the scores variable, which should be an array of      #
     # shape (N, C).                                                             #
     #############################################################################
-    hidden_output = np.dot(X,W1) + b1
-    #relu
-    hidden_output = np.clip(hidden_output,0,np.inf)
-    scores = np.dot(hidden_output, W2) + b2
+    pass
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
@@ -95,19 +92,7 @@ class TwoLayerNet(object):
     # in the variable loss, which should be a scalar. Use the Softmax           #
     # classifier loss.                                                          #
     #############################################################################
-    hidden_output = np.dot(X,W1) + b1
-    #relu
-    hidden_relu = np.clip(hidden_output,0,np.inf)
-    scores = np.dot(hidden_relu, W2) + b2
-    p_unnorm = np.exp(scores)
-    p_sum = np.sum(p_unnorm,1)[:,None]
-    p_sum_inv = 1/p_sum
-    p = p_unnorm * p_sum_inv
-    yp = np.choose(y, p.T)
-    p_log = np.log(yp)
-    loss = -np.mean(p_log)
-    reg_loss = reg*np.sum(W1**2) + reg*np.sum(W2**2)
-    loss += reg_loss
+    pass
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
@@ -119,38 +104,7 @@ class TwoLayerNet(object):
     # and biases. Store the results in the grads dictionary. For example,       #
     # grads['W1'] should store the gradient on W1, and be a matrix of same size #
     #############################################################################
-    # compute local gradients
-    dloss = 1
-    dp_log = np.zeros_like(p_log)
-    dp_log[:] = -1/len(dp_log)
-    dyp = 1/yp
-    dp = np.zeros_like(p)
-    dp[np.arange(len(dp)), y]=1
-    dp_sum_inv = p_unnorm
-    dp_unnorm = p_sum_inv
-    dp_sum = -p_sum**-2
-    dp_unnorm2 = np.ones_like(p_unnorm)
-    dscores = np.exp(scores)
-    dW2 = hidden_relu
-    dhidden_relu = W2
-    dhidden_output = np.where(hidden_output<0,0,1)
-    dW1 = X
-    
-    dw = X
-    dw_reg = 2*reg*W
-
-    # compute gradients of loss wrt W using chain rule
-    dLp_log = dloss * dp_log
-    dLyp = dLp_log * dyp
-    dLp = dLyp[:,None] * dp
-    dLp_sum_inv = (dLp * dp_sum_inv).sum(1)
-    dLp_unnorm = dLp * dp_unnorm
-    dLp_sum = dLp_sum_inv[:,None] * dp_sum
-    dLp_unnorm2 = dLp_sum * dp_unnorm2
-    dLp_unnorm += dLp_unnorm2
-    dLwx = dLp_unnorm * dwx
-    dW = np.dot(dw.T, dLwx)
-    dW += dw_reg
+    pass
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
