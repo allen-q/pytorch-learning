@@ -120,9 +120,12 @@ def rnn_forward(x, h0, Wx, Wh, b):
     H = b.shape[0]
     h = np.zeros((N,T,H))
     h_prev = h0
+    cache = []
     for n in range(T):
-        h_prev, cache = rnn_step_forward(x[:,n,:], h_prev, Wx, Wh, b)
+        h_prev, cache_step = rnn_step_forward(x[:,n,:], h_prev, Wx, Wh, b)
         h[:,n,:] = h_prev
+        cache.append(cache_step)
+        
     ##############################################################################
     #                               END OF YOUR CODE                             #
     ##############################################################################
@@ -149,12 +152,29 @@ def rnn_backward(dh, cache):
     - db: Gradient of biases, of shape (H,)
     """
     dx, dh0, dWx, dWh, db = None, None, None, None, None
+    N, T, H = dh.shape    
     ##############################################################################
     # TODO: Implement the backward pass for a vanilla RNN running an entire      #
     # sequence of data. You should use the rnn_step_backward function that you   #
     # defined above. You can use a for loop to help compute the backward pass.   #
     ##############################################################################
-    pass
+    dprev_h =dh[:,-1,:].reshape(N,H)
+    for n in range(T)[::-1]:
+        dx_step, dprev_h, dWx_step, dWh_step, db_step = rnn_step_backward(dprev_h, cache[n])
+        if n > 0:
+            dprev_h += dh[:,n-1,:].reshape(N,H)
+        if dx is None:
+            N,D = dx_step.shape
+            dx = np.zeros((N,T,D))
+            dWx = np.zeros((D, H))
+            dWh = np.zeros((H, H))
+            db = np.zeros((H,))
+        dx[:,n,:] = dx_step
+        dWx+=dWx_step
+        dWh+=dWh_step
+        db+=db_step
+        
+    dh0 = dprev_h
     ##############################################################################
     #                               END OF YOUR CODE                             #
     ##############################################################################
@@ -182,7 +202,8 @@ def word_embedding_forward(x, W):
     #                                                                            #
     # HINT: This can be done in one line using NumPy's array indexing.           #
     ##############################################################################
-    pass
+    out = np.choose(x.reshape(*x.shape,-1), W)
+    cache = [x, W]
     ##############################################################################
     #                               END OF YOUR CODE                             #
     ##############################################################################
@@ -211,7 +232,10 @@ def word_embedding_backward(dout, cache):
     # Note that words can appear more than once in a sequence.                   #
     # HINT: Look up the function np.add.at                                       #
     ##############################################################################
-    pass
+    x, W = cache
+    dW = np.zeros_like(W)
+    #[np.add.at(dW, x[i],dout[i]) for i in range(len(x))]
+    np.add.at(dW, x.ravel(),dout.reshape(-1,dout.shape[-1]))
     ##############################################################################
     #                               END OF YOUR CODE                             #
     ##############################################################################

@@ -73,8 +73,6 @@ class CaptioningRNN(object):
         # Cast parameters to correct dtype
         for k, v in self.params.items():
             self.params[k] = v.astype(self.dtype)
-            
-        print(locals())
 
 
     def loss(self, features, captions):
