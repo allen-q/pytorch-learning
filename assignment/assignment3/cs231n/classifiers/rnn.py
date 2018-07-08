@@ -74,10 +74,9 @@ class CaptioningRNN(object):
         for k, v in self.params.items():
             self.params[k] = v.astype(self.dtype)
             
-        print(locals())
 
 
-    def loss(self, features, captions):
+    def loss(self, features, captions):        
         """
         Compute training-time loss for the RNN. We input image features and
         ground-truth captions for those images, and use an RNN (or LSTM) to compute
@@ -142,11 +141,51 @@ class CaptioningRNN(object):
         # Note also that you are allowed to make use of functions from layers.py   #
         # in your implementation, if needed.                                       #
         ############################################################################
-        pass
+        
+        #1. Calculate h0 features(10,20)*W_proj(20,40)=(10,40)
+        h0 = np.dot(features, W_proj)+b_proj
+        #2. Calculate x. in: captions(10,13), W_embed(3,30), out:(10,13,30), 
+        #from  boxx import g
+        #g()
+        x, x_cache  = word_embedding_forward(captions_in, W_embed)
+        #3. rnn/lstm forward. Out: h(10,13,40)
+        if self.cell_type == 'rnn':
+            h, h_cache = rnn_forward(x, h0, Wx, Wh, b)
+        else:
+            h, h_cache = lstm_forward(x, h0, Wx, Wh, b)
+
+        #4. affine_forward. In: h(10,13,40), W_vocab(40,3), out:(10,13,3)
+        out, out_cache = temporal_affine_forward(h, W_vocab, b_vocab)
+        #5. calculate loss        
+
+        loss, dout = temporal_softmax_loss(out, captions_out, mask)
+        
+        # compute grads for all parameters
+        dh, dW_vocab, db_vocab = temporal_affine_backward(dout, out_cache)
+        if self.cell_type == 'rnn':
+            dx, dh0, dWx, dWh, db = rnn_backward(dh, h_cache)
+        else:
+            dx, dh0, dWx, dWh, db = lstm_backward(dh, h_cache)        
+        
+        dW_embed = word_embedding_backward(dx, x_cache)
+        
+        dW_proj = np.dot(features.T, dh0)
+        #print(dh0.shape)
+        db_proj = dh0.sum(0)
+        #print(db_proj.shape)
+        
+        grads['W_proj'] = dW_proj
+        grads['b_proj'] = db_proj
+        grads['W_vocab'] = dW_vocab
+        grads['b_vocab'] = db_vocab
+        grads['W_embed'] = dW_embed
+        grads['b'] = db
+        grads['Wh'] = dWh
+        grads['Wx'] = dWx
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
-
+        
         return loss, grads
 
 
@@ -207,7 +246,24 @@ class CaptioningRNN(object):
         # NOTE: we are still working over minibatches in this function. Also if   #
         # you are using an LSTM, initialize the first cell state to zeros.        #
         ###########################################################################
-        pass
+        #g()
+
+        prev_h = np.dot(features, W_proj)+b_proj
+        prev_c = np.zeros_like(prev_h)
+        x, x_cache  = word_embedding_forward(np.full((2), self._start), W_embed)
+        if self.cell_type == 'rnn':
+            for i in range(max_length):
+                prev_h, _ = rnn_step_forward(x, prev_h, Wx, Wh, b)
+                out, _ = temporal_affine_forward(h_prev.reshape(N,1,-1), W_vocab, b_vocab)
+                captions[:,i] = out.argmax(2).ravel()
+                x, x_cache  = word_embedding_forward(captions[:,i], W_embed)
+        else:
+            for i in range(max_length):
+                prev_h, prev_c, _ =  lstm_step_forward(x, prev_h, prev_c, Wx, Wh, b)
+                out, _ = temporal_affine_forward(prev_h.reshape(N,1,-1), W_vocab, b_vocab)
+                captions[:,i] = out.argmax(2).ravel()
+                x, x_cache  = word_embedding_forward(captions[:,i], W_embed)
+            
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################

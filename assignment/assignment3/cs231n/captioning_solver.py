@@ -148,6 +148,8 @@ class CaptioningSolver(object):
         captions, features, urls = minibatch
 
         # Compute loss and gradient
+        #from  boxx import g
+        #g()
         loss, grads = self.model.loss(features, captions)
         self.loss_history.append(loss)
 
