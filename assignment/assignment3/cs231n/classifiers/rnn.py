@@ -254,7 +254,7 @@ class CaptioningRNN(object):
         if self.cell_type == 'rnn':
             for i in range(max_length):
                 prev_h, _ = rnn_step_forward(x, prev_h, Wx, Wh, b)
-                out, _ = temporal_affine_forward(h_prev.reshape(N,1,-1), W_vocab, b_vocab)
+                out, _ = temporal_affine_forward(prev_h.reshape(N,1,-1), W_vocab, b_vocab)
                 captions[:,i] = out.argmax(2).ravel()
                 x, x_cache  = word_embedding_forward(captions[:,i], W_embed)
         else:
