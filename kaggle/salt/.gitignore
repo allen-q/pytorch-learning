@@ -1,0 +1,8 @@
+*.csv
+*.pyc
+*.log
+*.pickle
+*.html
+*.zip
+*.png
+Code/.ipynb_checkpoints/
