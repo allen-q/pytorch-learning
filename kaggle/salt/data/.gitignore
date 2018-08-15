@@ -1,4 +1,4 @@
-*.csv
+*submission*.csv
 *.pyc
 *.log
 *.pickle
