@@ -73,10 +73,10 @@ class up(nn.Module):
 class outconv(nn.Module):
     def __init__(self, in_ch, out_ch):
         super(outconv, self).__init__()
-        self.conv = nn.Conv2d(in_ch, out_ch, 1, padding = 3)
+        self.conv = nn.Conv2d(in_ch, out_ch, 1)
         self.sig = nn.Sigmoid()
 
     def forward(self, x):
         x_conv = self.conv(x)
         x = self.sig(x_conv)
-        return x[:,:,:-1,:-1].squeeze()
+        return x[:,:,:101,:101].squeeze()

@@ -56,7 +56,7 @@ class IOU_Loss(nn.Module):
 class SaltDataset(Dataset):
     """Face Landmarks dataset."""
 
-    def __init__(self, np_img, np_mask, df_depth, mean_img, transform=None):
+    def __init__(self, np_img, np_mask, df_depth, mean_img, img_out_size=101, transform=None):
         """
         Args:
             data_dir (string): Path to the image files.
@@ -68,6 +68,7 @@ class SaltDataset(Dataset):
         self.np_mask = np_mask
         self.df_depth = df_depth
         self.mean_img = mean_img
+        self.img_out_size = img_out_size
         self.transform = transform
 
     def __len__(self):
@@ -80,7 +81,8 @@ class SaltDataset(Dataset):
         #print(X.dtype)
         X = np.moveaxis(X, -1,0)
         
-        X = np.pad(X, [(0, 0),(0, 1), (0, 1)], mode='constant')
+        pad_size = self.img_out_size - self.np_img.shape[2]
+        X = np.pad(X, [(0, 0),(0, pad_size), (0, pad_size)], mode='constant')
         #print(X.dtype)
         if self.np_mask is None:
             y = np.zeros((101,101,1))
