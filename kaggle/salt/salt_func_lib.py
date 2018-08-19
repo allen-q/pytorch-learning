@@ -205,8 +205,8 @@ class SaltDataset(Dataset):
 
         d = self.df_depth.iloc[idx,0]
         #id = self.df_depth.index[idx]
-        from boxx import g
-        g()
+        #from boxx import g
+        #g()
         X = torch.from_numpy(X).float().type(dtype)
         y = torch.from_numpy(y).float().squeeze().type(dtype)
 
