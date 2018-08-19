@@ -74,7 +74,7 @@ class Rescale(object):
         else:
             current_scale = self.scale
       
-        output_size = round(np.max(image.shape) * self.scale)        
+        output_size = round(np.max(image.shape) * current_scale)        
         
         if mask is not None:
             image = np.concatenate([image,mask],2)
@@ -159,7 +159,6 @@ class Flip(object):
 
 transformed = composed({'image':image, 'mask':mask})
 x_final, m_final = transformed['image'], transformed['mask']'''
-
 
 class SaltDataset(Dataset):
     """Face Landmarks dataset."""
