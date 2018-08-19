@@ -52,7 +52,115 @@ class IOU_Loss(nn.Module):
         
         return iou_loss
       
+
+        
+class Rescale(object):
+    """Rescale the image in a sample to a given size.
+
+    Args:
+        output_size (int): Desired output size. 
+    """
+
+    def __init__(self, scale='random', min_scale=1, max_scale=3):
+        self.scale = scale 
+        self.min_scale = min_scale   
+        self.max_scale = max_scale   
+
+    def __call__(self, sample):
+        image, mask = sample['image'], sample['mask']
+        
+        if self.scale == 'random':
+            current_scale = np.clip((np.random.rand() * self.max_scale), self.min_scale, self.max_scale)
+        else:
+            current_scale = self.scale
       
+        output_size = round(np.max(image.shape) * self.scale)        
+        
+        if mask is not None:
+            image = np.concatenate([image,mask],2)
+        resized_img = transform.resize(image, (output_size, output_size), mode='constant', preserve_range=True)
+        #print(resized_img.shape)
+        img_final = resized_img[:,:,0:1]
+        if mask is not None:
+            mask_final = resized_img[:,:,1:]
+
+        return {'image':img_final, 'mask':mask_final}
+
+class RandomCrop(object):
+    """Crop randomly the image in a sample.
+
+    Args:
+        output_size (int): Desired output size. 
+    """
+
+    def __init__(self, output_size):
+        assert isinstance(output_size, int)
+        self.output_size = output_size
+
+    def __call__(self, sample):
+        image, mask = sample['image'], sample['mask']
+        if mask is not None:
+            image = np.concatenate([image,mask],2)
+
+        h, w = image.shape[:2]
+
+        new_h = new_w = self.output_size
+        top = 0 if h == new_h else np.random.randint(0, h - new_h)
+        left = 0 if w == new_w else np.random.randint(0, w - new_w)
+
+
+        cropped_image = image[top: top + new_h,
+                      left: left + new_w]
+        
+        img_final = cropped_image[:,:,0:1]
+        if mask is not None:
+            mask_final = cropped_image[:,:,1:]
+
+        return {'image':img_final, 'mask':mask_final}
+
+class Flip(object):
+    """Crop randomly the image in a sample.
+
+    Args:
+        output_size (int): Desired output size. 
+    """
+
+    def __init__(self, orient='random'):
+        assert orient in ['H', 'V', 'NA', 'random']
+        self.orient = orient
+
+    def __call__(self, sample):
+        image, mask = sample['image'], sample['mask']
+        if self.orient=='random':
+            current_orient = np.random.choice(['H', 'W', 'NA', 'NA'])     
+        else:
+            current_orient = self.orient
+        
+        if mask is not None:
+            image = np.concatenate([image,mask],2)
+
+        if current_orient == 'H':
+            flipped_image = image[:,::-1,:] - np.zeros_like(image)
+        elif current_orient == 'W':
+            flipped_image = image[::-1,:,:] - np.zeros_like(image)
+        else:
+            # do not flip if orient is NA
+            flipped_image = image
+        img_final = flipped_image[:,:,0:1]
+        if mask is not None:
+            mask_final = flipped_image[:,:,1:]
+
+        return {'image':img_final, 'mask':mask_final}
+
+'''composed = transforms.Compose([Rescale(scale='random', max_scale=5),
+                               RandomCrop(101),
+                               Flip(orient='random')])
+
+
+transformed = composed({'image':image, 'mask':mask})
+x_final, m_final = transformed['image'], transformed['mask']'''
+
+
 class SaltDataset(Dataset):
     """Face Landmarks dataset."""
 
@@ -65,7 +173,7 @@ class SaltDataset(Dataset):
                 on a sample.
         """
         self.np_img = np_img
-        self.np_mask = np_mask
+        self.np_mask = np_mask.clip(0,1)
         self.df_depth = df_depth
         self.mean_img = mean_img
         self.img_out_size = img_out_size
@@ -78,25 +186,31 @@ class SaltDataset(Dataset):
 
         X_orig = self.np_img[idx]
         X = X_orig - self.mean_img
+        
+        if self.np_mask is None:
+            y = np.zeros((101,101,1))
+        else:
+            y = self.np_mask[idx]
+            
+        if self.transform:
+            transformed = self.transform({'image':X, 'mask': y})
+            X = transformed['image']
+            y = transformed['mask']
+            
         #print(X.dtype)
         X = np.moveaxis(X, -1,0)
         
         pad_size = self.img_out_size - self.np_img.shape[2]
         X = np.pad(X, [(0, 0),(0, pad_size), (0, pad_size)], mode='constant')
         #print(X.dtype)
-        if self.np_mask is None:
-            y = np.zeros((101,101,1))
-        else:
-            y = self.np_mask[idx].clip(0,1)
+
         d = self.df_depth.iloc[idx,0]
         #id = self.df_depth.index[idx]
+        from boxx import g
+        g()
         X = torch.from_numpy(X).float().type(dtype)
         y = torch.from_numpy(y).float().squeeze().type(dtype)
 
-        if self.transform:
-            X = self.transform(X)
-        #from boxx import g
-        #g()
         return (X,y,d,idx)
       
 
