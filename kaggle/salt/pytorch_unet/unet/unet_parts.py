@@ -42,7 +42,9 @@ class down(nn.Module):
         )
 
     def forward(self, x):
+        print(f'in: {x.shape}')
         x = self.mpconv(x)
+        print(f'out: {x.shape}')
         return x
 
 
@@ -60,6 +62,7 @@ class up(nn.Module):
         self.conv = double_conv(in_ch, out_ch)
 
     def forward(self, x1, x2):
+        print(f'in: {x.shape}')
         x1 = self.up(x1)
         diffX = x1.size()[2] - x2.size()[2]
         diffY = x1.size()[3] - x2.size()[3]
@@ -67,6 +70,7 @@ class up(nn.Module):
                         diffY // 2, int(diffY / 2)))
         x = torch.cat([x2, x1], dim=1)
         x = self.conv(x)
+        print(f'out: {x.shape}')
         return x
 
 
