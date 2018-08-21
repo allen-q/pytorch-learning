@@ -7,3 +7,5 @@
 Code/.ipynb_checkpoints/
 !depths.csv
 !misc_data.pickle
+!logs
+!*.log
