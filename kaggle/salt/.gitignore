@@ -1,6 +1,5 @@
 *.csv
 *.pyc
-*.log
 *.pickle
 *.html
 *.zip

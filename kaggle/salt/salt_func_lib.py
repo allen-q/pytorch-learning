@@ -29,6 +29,8 @@ import math
 import datetime as dt
 import pytz
 import pickle
+import logging
+from io import BytesIO
 
 
 if torch.cuda.is_available():
@@ -399,35 +401,42 @@ def show_img_grid():
     #plt.imshow(torchvision.utils.make_grid(torch.from_numpy(y_train_black).unsqueeze(1)).permute(1, 2, 0))
     
     
-def join_files(origFileName, newFileName, noOfChunks):
+def join_files(filePrefix, filePath, newFileName=None, returnFileObject=False, removeChunks=False):  
+    noOfChunks = int(glob.glob(f'{filePath}/{filePrefix}*')[0].split('-')[-1])
     dataList = []
-
     j = 0
     for i in range(0, noOfChunks, 1):
         j += 1
-        chunkName = "%s-chunk-%s-Of-%s" % (origFileName, j, noOfChunks)
+        chunkName = f"{filePrefix}-chunk-{j}-Of-{noOfChunks}"
         f = open(chunkName, 'rb')
         dataList.append(f.read())
         f.close()
+        if removeChunks:
+            os.remove(chunkName)
 
-    j = 0
-    for i in range(0, noOfChunks, 1):
-        j += 1
-        chunkName = "%s-chunk-%s-Of-%s" % (origFileName, j, noOfChunks)
-        # Deleting the chunck file.
-        os.remove(chunkName)
-
-    f2 = open(newFileName, 'wb')
-    for data in dataList:
-        f2.write(data)
-    f2.close()
+    if returnFileObject:
+        fileOut = BytesIO()
+        for data in dataList:
+            fileOut.write(data)
+        fileOut.seek(0)
+        return fileOut    
+    else:
+        fileOut = open(newFileName, 'wb')
+        for data in dataList:
+            fileOut.write(data)
+        f2.close()
+        print(f'File parts merged to {newFileName} successfully.')
     
 # define the function to split the file into smaller chunks
-def split_file(inputFile, chunkSize):
+def split_file_save(inputFile, outputFilePrefix, outputFolder, chunkSize=10000000):
     # read the contents of the file
-    f = open(inputFile, 'rb')
-    data = f.read()
-    f.close()
+    if isinstance(inputFile, BytesIO):
+        data = inputFile.read()
+        inputFile.close()
+    else:
+        f = open(inputFile, 'rb')
+        data = f.read()
+        f.close()
 
 # get the length of data, ie size of the input file in bytes
     bytes = len(data)
@@ -440,20 +449,47 @@ def split_file(inputFile, chunkSize):
     if(bytes % chunkSize):
         noOfChunks += 1
 
-# create a metadata txt file for writing metadata
-    metadata_file = "metadata-%s.txt" % inputFile
-    f = open(metadata_file, 'w')
-    f.write('input file = ' + inputFile + '\n')
-    f.write('Number of Chunks = ' + str(noOfChunks) + '\n')
-    f.write('Chunk Size = ' + str(chunkSize) + '\n')
-    f.close()
-
     chunkNames = []
     j = 0
     for i in range(0, bytes + 1, chunkSize):
         j += 1
-        fn1 = "%s-chunk-%s-Of-%s" % (inputFile, j, noOfChunks)
+        fn1 = f"{outputFilePrefix}-chunk-{j}-Of-{noOfChunks}"
         chunkNames.append(fn1)
-        f = open(fn1, 'wb')
+        f = open(f'{outputFolder}/{fn1}', 'wb')
         f.write(data[i:i + chunkSize])
         f.close()
+        
+    return chunkNames
+        
+def get_logger(logger_name, level=logging.DEBUG):
+    # logger
+    file_name = '{}{}'.format('logs/',
+                                logger_name)
+    timestamp = dt.datetime.now(pytz.timezone('Australia/Melbourne'))\
+        .strftime('%Y_%m_%d_%Hh')
+    log_file = '{}_{}.log'.format(file_name, timestamp)
+    logger = logging.getLogger(logger_name)
+
+    formatter = (
+        logging
+        .Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                   datefmt='%d/%m/%Y %H:%M:%S')
+    )
+
+    # for printing debug details
+    fileHandler = logging.FileHandler(log_file, mode='a')
+    fileHandler.setFormatter(formatter)
+    fileHandler.setLevel(level)
+
+    # for printing error messages
+    streamHandler = logging.StreamHandler()
+    streamHandler.setFormatter(formatter)
+    streamHandler.setLevel(logging.DEBUG)
+
+    logger.setLevel(level)
+    logger.handlers = []
+    logger.addHandler(fileHandler)
+    logger.addHandler(streamHandler)
+
+    return logging.getLogger(logger_name)
+        
