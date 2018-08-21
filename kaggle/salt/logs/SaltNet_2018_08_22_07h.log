@@ -737,3 +737,22 @@ Parameter Group 0
 21/08/2018 23:07:49 - SaltNet - INFO - ['Unet_Data_Augmentation_2018_08_22_08_29_05.ckp-chunk-1-Of-5', 'Unet_Data_Augmentation_2018_08_22_08_29_05.ckp-chunk-2-Of-5', 'Unet_Data_Augmentation_2018_08_22_08_29_05.ckp-chunk-3-Of-5', 'Unet_Data_Augmentation_2018_08_22_08_29_05.ckp-chunk-4-Of-5', 'Unet_Data_Augmentation_2018_08_22_08_29_05.ckp-chunk-5-Of-5']
 21/08/2018 23:07:49 - SaltNet - INFO - Best Val Mean IOU so far: 0.0875
 21/08/2018 23:07:49 - SaltNet - INFO - Pushing model state to git.
+21/08/2018 23:08:52 - SaltNet - INFO - Epoch 1/7
+21/08/2018 23:08:52 - SaltNet - INFO - --------------------
+21/08/2018 23:08:52 - SaltNet - INFO - Batch Loss is 0.4942, Running loss is 0.5719, Batch IOU is 0.0250 at iter 6, epoch 1, Time: 1m 6s
+21/08/2018 23:08:53 - SaltNet - INFO - Batch Loss is 0.4264, Running loss is 0.5477, Batch IOU is 0.2500 at iter 8, epoch 1, Time: 1m 7s
+21/08/2018 23:08:54 - SaltNet - INFO - train Mean IOU is 0.1938 at epoch 1
+21/08/2018 23:08:54 - SaltNet - INFO - val Mean IOU is 0.0563 at epoch 1
+21/08/2018 23:08:54 - SaltNet - INFO - Epoch 2/7
+21/08/2018 23:08:54 - SaltNet - INFO - --------------------
+21/08/2018 23:08:55 - SaltNet - INFO - Batch Loss is 0.4292, Running loss is 0.5605, Batch IOU is 0.1250 at iter 10, epoch 2, Time: 1m 8s
+21/08/2018 23:08:56 - SaltNet - INFO - Batch Loss is 0.5434, Running loss is 0.5587, Batch IOU is 0.0000 at iter 12, epoch 2, Time: 1m 9s
+21/08/2018 23:08:56 - SaltNet - INFO - train Mean IOU is 0.0312 at epoch 2
+21/08/2018 23:08:57 - SaltNet - INFO - val Mean IOU is 0.0563 at epoch 2
+21/08/2018 23:08:57 - SaltNet - INFO - Epoch 3/7
+21/08/2018 23:08:57 - SaltNet - INFO - --------------------
+21/08/2018 23:08:57 - SaltNet - INFO - Batch Loss is 0.4510, Running loss is 0.5626, Batch IOU is 0.0000 at iter 14, epoch 3, Time: 1m 10s
+21/08/2018 23:08:58 - SaltNet - INFO - Batch Loss is 0.4221, Running loss is 0.5526, Batch IOU is 0.0000 at iter 16, epoch 3, Time: 1m 12s
+21/08/2018 23:08:59 - SaltNet - INFO - train Mean IOU is 0.1125 at epoch 3
+21/08/2018 23:08:59 - SaltNet - INFO - val Mean IOU is 0.0125 at epoch 3
+21/08/2018 23:08:59 - SaltNet - INFO - Pushing model state to git.
