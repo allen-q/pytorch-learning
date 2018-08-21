@@ -1,0 +1,3 @@
+input file = pytorch_model.ckp
+Number of Chunks = 6
+Chunk Size = 10240000
