@@ -784,3 +784,6 @@ Parameter Group 0
 21/08/2018 23:10:22 - SaltNet - INFO - train Mean IOU is 0.2437 at epoch 7
 21/08/2018 23:10:23 - SaltNet - INFO - val Mean IOU is 0.1375 at epoch 7
 21/08/2018 23:10:23 - SaltNet - INFO - Pushing model state to git.
+21/08/2018 23:10:30 - SaltNet - INFO - --------------------
+21/08/2018 23:10:30 - SaltNet - INFO - Training complete in 2m 44s
+21/08/2018 23:10:30 - SaltNet - INFO - Best val IOU: 0.250000
