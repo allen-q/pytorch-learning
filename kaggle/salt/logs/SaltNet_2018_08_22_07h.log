@@ -33,3 +33,151 @@
 21/08/2018 21:47:50 - SaltNet - INFO - Epoch 3/4
 21/08/2018 21:47:50 - SaltNet - INFO - --------------------
 21/08/2018 21:47:51 - SaltNet - INFO - Batch Loss is 0.5287, Running loss is 0.6058, Batch IOU is 0.2500 at iter 14, epoch 3, Time: 1m 45s
+21/08/2018 22:29:07 - SaltNet - INFO - Start Training...
+21/08/2018 22:29:07 - SaltNet - INFO - Passed parameters: {'push_every': 2, 'print_every': 2, 'num_epochs': 5, 'model_save_name': 'Unet_Data_Augmentation_2018_08_22_08_29_05.ckp', 'scheduler': <torch.optim.lr_scheduler.StepLR object at 0x7fa87ce79e48>, 'optimizer': Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    initial_lr: 0.001
+    lr: 0.001
+    weight_decay: 0
+), 'criterion': BCELoss(), 'dataloaders': {'train': <torch.utils.data.dataloader.DataLoader object at 0x7fa8d394def0>, 'val': <torch.utils.data.dataloader.DataLoader object at 0x7fa8d394d780>}, 'model': UNet(
+  (inc): inconv(
+    (conv): double_conv(
+      (conv): Sequential(
+        (0): Conv2d(1, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (2): ReLU(inplace)
+        (3): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (4): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (5): ReLU(inplace)
+      )
+    )
+  )
+  (down1): down(
+    (mpconv): Sequential(
+      (0): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+      (1): double_conv(
+        (conv): Sequential(
+          (0): Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU(inplace)
+          (3): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (4): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (5): ReLU(inplace)
+        )
+      )
+    )
+  )
+  (down2): down(
+    (mpconv): Sequential(
+      (0): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+      (1): double_conv(
+        (conv): Sequential(
+          (0): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU(inplace)
+          (3): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (4): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (5): ReLU(inplace)
+        )
+      )
+    )
+  )
+  (down3): down(
+    (mpconv): Sequential(
+      (0): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+      (1): double_conv(
+        (conv): Sequential(
+          (0): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU(inplace)
+          (3): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (4): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (5): ReLU(inplace)
+        )
+      )
+    )
+  )
+  (down4): down(
+    (mpconv): Sequential(
+      (0): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+      (1): double_conv(
+        (conv): Sequential(
+          (0): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU(inplace)
+          (3): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (4): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (5): ReLU(inplace)
+        )
+      )
+    )
+  )
+  (up1): up(
+    (up): Upsample(scale_factor=2, mode=bilinear)
+    (conv): double_conv(
+      (conv): Sequential(
+        (0): Conv2d(1024, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (2): ReLU(inplace)
+        (3): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (4): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (5): ReLU(inplace)
+      )
+    )
+  )
+  (up2): up(
+    (up): Upsample(scale_factor=2, mode=bilinear)
+    (conv): double_conv(
+      (conv): Sequential(
+        (0): Conv2d(512, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (2): ReLU(inplace)
+        (3): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (4): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (5): ReLU(inplace)
+      )
+    )
+  )
+  (up3): up(
+    (up): Upsample(scale_factor=2, mode=bilinear)
+    (conv): double_conv(
+      (conv): Sequential(
+        (0): Conv2d(256, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (2): ReLU(inplace)
+        (3): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (4): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (5): ReLU(inplace)
+      )
+    )
+  )
+  (up4): up(
+    (up): Upsample(scale_factor=2, mode=bilinear)
+    (conv): double_conv(
+      (conv): Sequential(
+        (0): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (2): ReLU(inplace)
+        (3): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (4): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (5): ReLU(inplace)
+      )
+    )
+  )
+  (outc): outconv(
+    (conv): Conv2d(64, 1, kernel_size=(1, 1), stride=(1, 1))
+    (sig): Sigmoid()
+  )
+)}
+21/08/2018 22:29:07 - SaltNet - INFO - Epoch 0/4
+21/08/2018 22:29:07 - SaltNet - INFO - --------------------
+21/08/2018 22:29:08 - SaltNet - INFO - Batch Loss is 0.7404, Running loss is 0.7404, Batch IOU is 0.0000 at iter 2, epoch 0, Time: 0m 0s
+21/08/2018 22:29:09 - SaltNet - INFO - Batch Loss is 0.6448, Running loss is 0.6926, Batch IOU is 0.0000 at iter 4, epoch 0, Time: 0m 1s
+21/08/2018 22:29:09 - SaltNet - INFO - train Mean IOU is 0.0125 at epoch 0
+21/08/2018 22:29:09 - SaltNet - INFO - val Mean IOU is 0.4375 at epoch 0
+21/08/2018 22:29:10 - SaltNet - INFO - ['Unet_Data_Augmentation_2018_08_22_08_29_05.ckp-chunk-1-Of-5', 'Unet_Data_Augmentation_2018_08_22_08_29_05.ckp-chunk-2-Of-5', 'Unet_Data_Augmentation_2018_08_22_08_29_05.ckp-chunk-3-Of-5', 'Unet_Data_Augmentation_2018_08_22_08_29_05.ckp-chunk-4-Of-5', 'Unet_Data_Augmentation_2018_08_22_08_29_05.ckp-chunk-5-Of-5']
+21/08/2018 22:29:10 - SaltNet - INFO - Best Val Mean IOU so far: 0.4375
+21/08/2018 22:29:11 - SaltNet - INFO - Pushing model state to git.
