@@ -213,7 +213,37 @@ class SaltDataset(Dataset):
         return (X,y,d,idx)
       
 
-
+class SaltNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.seq = nn.Sequential(
+            nn.Conv2d(1,64,3, padding=10),
+            nn.MaxPool2d(2, 2),
+            nn.ReLU(),
+            nn.BatchNorm2d(64),
+            nn.Conv2d(64,128,3),
+            nn.MaxPool2d(2, 2),
+            nn.ReLU(),
+            nn.BatchNorm2d(128),
+            nn.Conv2d(128,256,3),
+            nn.MaxPool2d(2, 2),
+            nn.ReLU(),
+            nn.BatchNorm2d(256),
+            nn.ConvTranspose2d(256, 128, 2, stride=2),
+            nn.ReLU(),
+            nn.BatchNorm2d(128),
+            nn.ConvTranspose2d(128, 64, 2, stride=2),
+            nn.ReLU(),
+            nn.BatchNorm2d(64),
+            nn.ConvTranspose2d(64, 1, 2, stride=2, padding=1),
+            nn.Sigmoid()
+        )
+        
+    def forward(self, X):
+        out = self.seq(X)
+        return torch.clamp(out[:,:,:-1,:-1].squeeze(), 0.0, 1.0)
+    
+    
 def load_all_data():
     try:
         print('Try loading data from npy and pickle files...')
@@ -319,27 +349,26 @@ def get_current_time_as_fname():
         return timestamp
       
       
-def plot_img_mask_pred(image, mask, pred=None):
-    if isinstance(image, torch.Tensor):
-        image = image.detach().numpy()
-    if isinstance(mask, torch.Tensor):
-        mask = mask.detach().numpy()
-    image = image.squeeze()
-    mask = mask.squeeze()
-    if pred is None:
-        f, axarr = plt.subplots(1,2)
-    else:
-        f, axarr = plt.subplots(1,3)        
-    axarr[0].imshow(image, cmap='gray')
-    axarr[1].imshow(mask, cmap='gray')    
-    axarr[0].grid()
-    axarr[1].grid()    
-    axarr[0].set_title('Image')
-    axarr[1].set_title('Mask')
-    if pred is not None:
-        axarr[2].imshow(pred, cmap='gray')
-        axarr[2].grid()
-        axarr[2].set_title('Predicted Mask')
+def plot_img_mask_pred(images, labels=None, img_per_line=8):
+    images = [i.cpu().detach().numpy().squeeze() if isinstance(i, torch.Tensor) else i.squeeze() for i in images]
+    num_img = len(images)
+    if labels is None:
+        labels = range(num_img)
+
+    rows = np.ceil(num_img/img_per_line).astype(int)
+    cols = min(img_per_line, num_img)
+    f, axarr = plt.subplots(rows,cols)
+    if rows==1:
+        axarr = axarr.reshape(1,-1)
+    f.set_figheight(3*min(img_per_line, num_img)//cols*rows)
+    f.set_figwidth(3*min(img_per_line, num_img))
+    for i in range(num_img):
+        r = i//img_per_line
+        c = np.mod(i,img_per_line)
+        axarr[r,c].imshow(images[i], cmap='gray')
+        axarr[r,c].grid()
+        axarr[r,c].set_title(labels[i])
+
     plt.show()
     
     
