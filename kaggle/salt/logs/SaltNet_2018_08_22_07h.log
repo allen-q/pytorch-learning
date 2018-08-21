@@ -777,3 +777,10 @@ Parameter Group 0
 21/08/2018 23:09:16 - SaltNet - INFO - train Mean IOU is 0.2000 at epoch 6
 21/08/2018 23:09:16 - SaltNet - INFO - val Mean IOU is 0.1500 at epoch 6
 21/08/2018 23:09:16 - SaltNet - INFO - Pushing model state to git.
+21/08/2018 23:10:20 - SaltNet - INFO - Epoch 7/7
+21/08/2018 23:10:20 - SaltNet - INFO - --------------------
+21/08/2018 23:10:21 - SaltNet - INFO - Batch Loss is 0.3379, Running loss is 0.5312, Batch IOU is 0.0000 at iter 30, epoch 7, Time: 2m 34s
+21/08/2018 23:10:22 - SaltNet - INFO - Batch Loss is 0.3485, Running loss is 0.5251, Batch IOU is 0.7250 at iter 32, epoch 7, Time: 2m 35s
+21/08/2018 23:10:22 - SaltNet - INFO - train Mean IOU is 0.2437 at epoch 7
+21/08/2018 23:10:23 - SaltNet - INFO - val Mean IOU is 0.1375 at epoch 7
+21/08/2018 23:10:23 - SaltNet - INFO - Pushing model state to git.
